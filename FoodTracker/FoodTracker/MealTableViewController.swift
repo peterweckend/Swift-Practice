@@ -7,12 +7,25 @@
 //
 
 import UIKit
+import os.log
 
 class MealTableViewController: UITableViewController {
     
     //MARK: Properties
     
     var meals = [Meal]()
+    
+    //MARK: Actions
+    @IBAction func unwindToMealList(sender: UIStoryboardSegue) {
+        if let sourceViewController = sender.source as? MealViewController, let meal = sourceViewController.meal {
+            
+            // add a new meal
+            let newIndexPath = IndexPath(row: meals.count, section: 0)
+            
+            meals.append(meal)
+            tableView.insertRows(at: [newIndexPath], with: .automatic)
+        }
+    }
     
     //MARK: Private Methods
     
@@ -112,14 +125,37 @@ class MealTableViewController: UITableViewController {
     }
     */
 
-    /*
+
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+        super.prepare(for: segue, sender: sender)
+        switch(segue.identifier ?? "") {
+       
+        case "AddItem":
+            os_log("adding a new mea", log: OSLog.default, type: .debug)
+            
+        case "ShowDetail":
+            guard let mealDetailViewController = segue.destination as? MealViewController
+                else {
+                    fatalError("Unexpected destination")
+                }
+            guard let selectedMealCell = sender as? MealTableViewCell else {
+                fatalError("unexpected sender")
+            }
+            guard let indexPath = tableView.indexPath(for: selectedMealCell) else {
+                fatalError("the selected cell is not being displayed by the table")
+            }
+            
+            let selectedMeal = meals[indexPath.row]
+            mealDetailViewController.meal = selectedMeal
+            
+        default:
+            fatalError("unexpected segue identifier")
+            
+        }
     }
-    */
+
 
 }
